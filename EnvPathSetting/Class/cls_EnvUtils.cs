@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Win32;
-using System.Runtime.InteropServices;
 
 namespace EnvPathSetting.Class
 {
@@ -12,6 +7,25 @@ namespace EnvPathSetting.Class
     {
         //[DllImport("Kernel32.DLL ", SetLastError = true)]
         //public static extern bool SetEnvironmentVariable(string lpName, string lpValue);
+
+        /// <summary>
+        /// 删除指定的环境变量
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool DeleteSysEnvironmentByName(string name)
+        {
+            try
+            {
+                OpenSysEnvironment().DeleteValue(name);
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// 获取指定的环境变量值
@@ -31,6 +45,15 @@ namespace EnvPathSetting.Class
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 获取系统环境变量名
+        /// </summary>
+        /// <returns></returns>
+        public static string[] GetAllSysEnvironmentName()
+        {
+            return OpenSysEnvironment().GetValueNames();
         }
 
         /// <summary>
@@ -90,6 +113,16 @@ namespace EnvPathSetting.Class
                     name = name + @"\;";
                 SetSysEnvironment("PATH",  path+ name);
             }
+        }
+
+        /// <summary>
+        /// 更新PATH环境变量
+        /// </summary>
+        /// <param name="name">环境变量名</param>
+        /// <param name="value">环境变量值</param>
+        public static void UpdateSysEnvironment(string name, string value)
+        {
+            SetSysEnvironment(name, value);
         }
     }
 }

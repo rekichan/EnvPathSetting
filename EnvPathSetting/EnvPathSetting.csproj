@@ -50,6 +50,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class\cls_EnvUtils.cs" />
+    <Compile Include="Class\cls_ListBoxEditor.cs" />
+    <Compile Include="Form\frm_Explain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\frm_Explain.Designer.cs">
+      <DependentUpon>frm_Explain.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form\frm_Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -58,6 +65,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form\frm_Explain.resx">
+      <DependentUpon>frm_Explain.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form\frm_Main.resx">
       <DependentUpon>frm_Main.cs</DependentUpon>
     </EmbeddedResource>
