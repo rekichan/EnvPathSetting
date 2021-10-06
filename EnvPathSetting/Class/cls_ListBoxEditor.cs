@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System;
 
 namespace EnvPathSetting.Class
 {
@@ -9,6 +11,14 @@ namespace EnvPathSetting.Class
         private ListBox _listBox;
         private string _itemSplitter;
         private TextBox _txtBox;
+
+        [DllImport("user32.dll ", CharSet = CharSet.Unicode)]
+        public static extern IntPtr PostMessage(IntPtr hwnd, int wMsg, int wParam, int lParam);
+
+        public static void PostMess(IntPtr hwmd, int msg)
+        {
+            PostMessage(hwmd, msg, 0, 0);
+        }
 
         public cls_ListBoxEditor(ListBox listBox, string itemSplitter = ";") 
         { 
@@ -75,6 +85,8 @@ namespace EnvPathSetting.Class
             }
             ListBox.Parent.Controls.Remove(_txtBox);
             _txtBox = null;
+
+            PostMess(cls_Common.hwndFrmMain, cls_Common.RELEASE_SAVE_AND_UNMAKE);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace EnvPathSetting
             reserve = new List<string>();
         }
         #endregion
-
+        
         #region API
         [DllImport("user32.dll", EntryPoint = "GetScrollPos")]
         public static extern int GetScrollPos(IntPtr hwnd, int nBar);
@@ -32,6 +32,7 @@ namespace EnvPathSetting
         private void frm_Main_Load(object sender, EventArgs e)
         {
             RefreshEnvPathName();
+            cls_Common.hwndFrmMain = this.Handle;
         }
         #endregion
 
@@ -85,6 +86,7 @@ namespace EnvPathSetting
                 string name = lst_ShowEnvPathName.Items[lst_ShowEnvPathName.SelectedIndex].ToString();
                 cls_EnvUtils.UpdateSysEnvironment(name, save);
                 tsmi_Unmake.Enabled = false;
+                tsmi_Save.Enabled = false;
 
                 MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -97,6 +99,8 @@ namespace EnvPathSetting
             lst_ShowEnvPathValue.Items.Clear();
             lst_ShowEnvPathValue.Items.AddRange(reserve.ToArray());
             lst_ShowEnvPathName.Enabled = true;
+            tsmi_Unmake.Enabled = false;
+            tsmi_Save.Enabled = false;
         }
 
         private void lst_ShowEnvPathValue_DoubleClick(object sender, EventArgs e)
@@ -107,12 +111,12 @@ namespace EnvPathSetting
                 reserve.Add(lst_ShowEnvPathValue.Items[i].ToString());
             }
             lst_ShowEnvPathName.Enabled = false;
-            tsmi_Unmake.Enabled = true;
+            //tsmi_Unmake.Enabled = true;
         }
 
         private void lst_ShowEnvPathName_SelectedIndexChanged(object sender, EventArgs e)
         {
-            tsmi_Unmake.Enabled = false;
+            //tsmi_Unmake.Enabled = false;
         }
 
         private void btn_SetSpecPath_Click(object sender, EventArgs e)
@@ -137,11 +141,27 @@ namespace EnvPathSetting
                 return;
             }
 
-            cls_EnvUtils.SetSysEnvironment(spec, value);
-
-            MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            RefreshEnvPathName();
+            string path = cls_EnvUtils.GetSysEnvironmentByName(spec);
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                DialogResult dr = MessageBox.Show("指定的环境变量已存在?点击\"是\"替换变量，\"否\"追加变量，\"取消\"不做任何操作", "info", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if(dr == DialogResult.No)
+                {
+                    cls_EnvUtils.UpdateSpecEnvironment(spec, value);
+                    MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else if (dr == DialogResult.Yes)
+                {
+                    cls_EnvUtils.SetSysEnvironment(spec, value);
+                    MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            else
+            {
+                cls_EnvUtils.SetSysEnvironment(spec, value);
+                RefreshEnvPathName();
+                MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
         }
 
@@ -226,6 +246,7 @@ namespace EnvPathSetting
             cls_EnvUtils.DeleteSysEnvironmentByName(name);
 
             RefreshEnvPathName();
+            lst_ShowEnvPathValue.Items.Clear();
         }
         #endregion
 
@@ -236,6 +257,22 @@ namespace EnvPathSetting
             lst_ShowEnvPathName.Items.Clear();
             string[] allName = cls_EnvUtils.GetAllSysEnvironmentName();
             lst_ShowEnvPathName.Items.AddRange(allName);
+        }
+        #endregion
+
+        #region Message
+        protected override void WndProc(ref Message m)
+        {
+            switch (m.Msg){
+                case cls_Common.RELEASE_SAVE_AND_UNMAKE:
+                    tsmi_Save.Enabled = true;
+                    tsmi_Unmake.Enabled = true;
+                    break;
+
+                default:
+                    base.WndProc(ref m);
+                    break;
+            }
         }
         #endregion
 

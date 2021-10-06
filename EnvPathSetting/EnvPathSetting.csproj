@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class\cls_Common.cs" />
     <Compile Include="Class\cls_EnvUtils.cs" />
     <Compile Include="Class\cls_ListBoxEditor.cs" />
     <Compile Include="Form\frm_Explain.cs">

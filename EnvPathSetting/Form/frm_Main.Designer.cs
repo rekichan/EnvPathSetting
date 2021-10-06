@@ -185,6 +185,7 @@ namespace EnvPathSetting
             // tsmi_Save
             // 
             this.tsmi_Save.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsmi_Save.Enabled = false;
             this.tsmi_Save.Name = "tsmi_Save";
             this.tsmi_Save.Size = new System.Drawing.Size(53, 24);
             this.tsmi_Save.Text = "保存";

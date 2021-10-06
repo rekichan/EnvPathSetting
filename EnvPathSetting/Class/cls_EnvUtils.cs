@@ -5,7 +5,7 @@ namespace EnvPathSetting.Class
 {
     class cls_EnvUtils
     {
-        //[DllImport("Kernel32.DLL ", SetLastError = true)]
+        //DllImport("Kernel32.DLL ", SetLastError = true)]
         //public static extern bool SetEnvironmentVariable(string lpName, string lpValue);
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace EnvPathSetting.Class
         }
 
         /// <summary>
-        /// 获取系统环境变量名
+        /// 获取所有环境变量名
         /// </summary>
         /// <returns></returns>
         public static string[] GetAllSysEnvironmentName()
@@ -57,7 +57,7 @@ namespace EnvPathSetting.Class
         }
 
         /// <summary>
-        /// 获取系统环境变量
+        /// 获取环境变量
         /// </summary>
         /// <returns></returns>
         private static RegistryKey OpenSysEnvironment()
@@ -73,7 +73,7 @@ namespace EnvPathSetting.Class
         }
 
         /// <summary>
-        /// 设置指定的环境变量
+        /// 设置环境变量
         /// </summary>
         /// <param name="name">环境变量名</param>
         /// <param name="value">环境变量值</param>
@@ -83,7 +83,7 @@ namespace EnvPathSetting.Class
         }
 
         /// <summary>
-        /// 更新PATH环境变量
+        /// 更新SYSPATH环境变量
         /// </summary>
         /// <param name="name">环境变量名</param>
         public static void UpdateSysEnvironment(string name,bool bin)
@@ -108,21 +108,52 @@ namespace EnvPathSetting.Class
             if (!isPathExist)
             {
                 if (bin)
-                    name = name + @"\bin;";
+                    name = name + "\\bin;";
                 else
-                    name = name + @"\;";
+                    name = name + ";";
                 SetSysEnvironment("PATH",  path+ name);
             }
         }
 
         /// <summary>
-        /// 更新PATH环境变量
+        /// 更新SYSPATH环境变量
         /// </summary>
         /// <param name="name">环境变量名</param>
         /// <param name="value">环境变量值</param>
         public static void UpdateSysEnvironment(string name, string value)
         {
             SetSysEnvironment(name, value);
+        }
+
+        /// <summary>
+        /// 更新SPEC环境变量
+        /// </summary>
+        /// <param name="name">环境变量名</param>
+        /// <param name="value">环境变量值</param>
+        public static void UpdateSpecEnvironment(string name, string value)
+        {
+            string path = GetSysEnvironmentByName(name);
+
+            if (path.Substring(path.Length - 1, 1) != ";")
+            {
+                SetSysEnvironment(name, path + ";");
+                path = GetSysEnvironmentByName(name);
+            }
+
+            string[] list = path.Split(';');
+            bool isPathExist = false;
+
+            foreach (string item in list)
+            {
+                if (item == value)
+                    isPathExist = true;
+            }
+
+            if (!isPathExist)
+            {
+                value = value + ";";
+                SetSysEnvironment(name, path + value);
+            }
         }
     }
 }
