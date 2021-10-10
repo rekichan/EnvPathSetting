@@ -8,18 +8,10 @@ namespace EnvPathSetting
 {
     public partial class frm_Main : Form
     {
-
-        #region property
-        cls_ListBoxEditor editor;
-        List<string> reserve;
-        #endregion
-
-        #region constructor
+        #region Constructor
         public frm_Main()
         {
             InitializeComponent();
-            editor = new cls_ListBoxEditor(lst_ShowEnvPathValue, Environment.NewLine);
-            reserve = new List<string>();
         }
         #endregion
         
@@ -31,232 +23,126 @@ namespace EnvPathSetting
         #region FormEvent
         private void frm_Main_Load(object sender, EventArgs e)
         {
-            RefreshEnvPathName();
             cls_Common.hwndFrmMain = this.Handle;
+            RefreshSysEnvPath();
+            RefreshUserEnvPath();
+            label4.Text = Environment.UserName + "用户环境变量值";
         }
         #endregion
 
         #region Event
+        private void btn_AddUserEnvPath_Click(object sender, EventArgs e)
+        {
+            cls_Common.isSystemEnvPath = false;
+            cls_Common.isModify = false;
+            cls_Common.isEdit = false;
+            frm_AddEnvPath addEnvPath = new frm_AddEnvPath();
+            addEnvPath.ShowDialog();
+        }
+
+        private void btn_AddSysEnvPath_Click(object sender, EventArgs e)
+        {
+            cls_Common.isSystemEnvPath = true;
+            cls_Common.isModify = false;
+            cls_Common.isEdit = false;
+            frm_AddEnvPath addEnvPath = new frm_AddEnvPath();
+            addEnvPath.ShowDialog();
+        }
+
+        private void btn_DelUserEnvPath_Click(object sender, EventArgs e)
+        {
+            if (dgv_UserEnvPath.SelectedCells.Count > 0)
+            {
+                if (MessageBox.Show("确认删除环境变量?", "Q", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    return;
+
+                string currentName = dgv_UserEnvPath.Rows[dgv_UserEnvPath.CurrentCell.RowIndex].Cells[0].Value.ToString();
+                cls_EnvUtils.DeleteUserEnvironmentByName(currentName);
+                dgv_UserEnvPath.Rows.Remove(dgv_UserEnvPath.Rows[dgv_UserEnvPath.CurrentCell.RowIndex]);
+            }
+        }
+
+        private void btn_DelSysEnvPath_Click(object sender, EventArgs e)
+        {
+            if (dgv_SysEnvPath.SelectedCells.Count > 0)
+            {
+                if (MessageBox.Show("确认删除环境变量?", "Q", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    return;
+                string currentName = dgv_SysEnvPath.Rows[dgv_SysEnvPath.CurrentCell.RowIndex].Cells[0].Value.ToString();
+                cls_EnvUtils.DeleteSysEnvironmentByName(currentName);
+                dgv_SysEnvPath.Rows.Remove(dgv_SysEnvPath.Rows[dgv_SysEnvPath.CurrentCell.RowIndex]);
+            }
+        }
+
+        private void btn_MdfUserEnvPath_Click(object sender, EventArgs e)
+        {
+            if (dgv_UserEnvPath.SelectedCells.Count > 0)
+            {
+                string currentName = dgv_UserEnvPath.Rows[dgv_UserEnvPath.CurrentCell.RowIndex].Cells[0].Value.ToString();
+                cls_Common.currentName = currentName;
+                cls_Common.isSystemEnvPath = false;
+                frm_MdfEnvPath mdfEnvPath = new frm_MdfEnvPath();
+                mdfEnvPath.ShowDialog();
+            }
+        }
+
+        private void btn_MdfSysEnvPath_Click(object sender, EventArgs e)
+        {
+            if (dgv_SysEnvPath.SelectedCells.Count > 0)
+            {
+                string currentName = dgv_SysEnvPath.Rows[dgv_SysEnvPath.CurrentCell.RowIndex].Cells[0].Value.ToString();
+                cls_Common.currentName = currentName;
+                cls_Common.isSystemEnvPath = true;
+                frm_MdfEnvPath mdfEnvPath = new frm_MdfEnvPath();
+                mdfEnvPath.ShowDialog();
+            }
+        }
+
         private void tsmi_Explain_Click(object sender, EventArgs e)
         {
             frm_Explain explain = new frm_Explain();
-            explain.Show();
-        }
-
-        private void lst_ShowEnvPathName_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (lst_ShowEnvPathName.SelectedIndex < 0)
-                return;
-
-            string spec = lst_ShowEnvPathName.GetItemText(lst_ShowEnvPathName.SelectedItem);
-            string name = cls_EnvUtils.GetSysEnvironmentByName(spec);
-
-            if (string.IsNullOrEmpty(name))
-            {
-                MessageBox.Show("不存在该环境变量名!", "warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            lst_ShowEnvPathValue.Items.Clear();
-            string[] path = name.Split(';');
-            lst_ShowEnvPathValue.Items.AddRange(path);
-        }
-
-        private void tsmi_Save_Click(object sender, EventArgs e)
-        {
-            string save = "";
-            for (int i = 0; i < lst_ShowEnvPathValue.Items.Count; i++)
-            {
-                string buf = lst_ShowEnvPathValue.Items[i].ToString();
-                if (!string.IsNullOrWhiteSpace(buf))
-                    save = save + lst_ShowEnvPathValue.Items[i].ToString() + ";";
-            }
-
-            if (string.IsNullOrWhiteSpace(save))
-                return;
-
-            if (lst_ShowEnvPathName.SelectedIndex < 0)
-            {
-                MessageBox.Show("未选择相应的环境变量名!", "warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (MessageBox.Show("确认保存新的环境变量?", "Q", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                string name = lst_ShowEnvPathName.Items[lst_ShowEnvPathName.SelectedIndex].ToString();
-                cls_EnvUtils.UpdateSysEnvironment(name, save);
-                tsmi_Unmake.Enabled = false;
-                tsmi_Save.Enabled = false;
-
-                MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
-            lst_ShowEnvPathName.Enabled = true;
-        }
-
-        private void tsmi_Unmake_Click(object sender, EventArgs e)
-        {
-            lst_ShowEnvPathValue.Items.Clear();
-            lst_ShowEnvPathValue.Items.AddRange(reserve.ToArray());
-            lst_ShowEnvPathName.Enabled = true;
-            tsmi_Unmake.Enabled = false;
-            tsmi_Save.Enabled = false;
-        }
-
-        private void lst_ShowEnvPathValue_DoubleClick(object sender, EventArgs e)
-        {
-            reserve.Clear();
-            for (int i = 0; i < lst_ShowEnvPathValue.Items.Count; i++)
-            {
-                reserve.Add(lst_ShowEnvPathValue.Items[i].ToString());
-            }
-            lst_ShowEnvPathName.Enabled = false;
-            //tsmi_Unmake.Enabled = true;
+            explain.ShowDialog();
         }
 
         private void lst_ShowEnvPathName_SelectedIndexChanged(object sender, EventArgs e)
         {
             //tsmi_Unmake.Enabled = false;
         }
-
-        private void btn_SetSpecPath_Click(object sender, EventArgs e)
-        {
-            string spec = txt_SetSpecPathName.Text.ToUpper();
-            if (string.IsNullOrWhiteSpace(spec))
-            {
-                MessageBox.Show("请输入环境变量名!", "warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            string value = txt_SetSpecPathValue.Text;
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                MessageBox.Show("请输入环境变量值!", "warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (!System.IO.Directory.Exists(value))
-            {
-                MessageBox.Show("输入的环境变量值路径不存在!", "warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            string path = cls_EnvUtils.GetSysEnvironmentByName(spec);
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                DialogResult dr = MessageBox.Show("指定的环境变量已存在?点击\"是\"替换变量，\"否\"追加变量，\"取消\"不做任何操作", "info", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                if(dr == DialogResult.No)
-                {
-                    cls_EnvUtils.UpdateSpecEnvironment(spec, value);
-                    MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else if (dr == DialogResult.Yes)
-                {
-                    cls_EnvUtils.SetSysEnvironment(spec, value);
-                    MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            else
-            {
-                cls_EnvUtils.SetSysEnvironment(spec, value);
-                RefreshEnvPathName();
-                MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
-        }
-
-        private void btn_UpdateEnvPath_Click(object sender, EventArgs e)
-        {
-            if (chk_DirectUpdate.Checked)
-            {
-                cls_EnvUtils.UpdateSysEnvironment(txt_SetSpecPathValue.Text, false);
-            }
-            else
-            {
-                string spec = txt_SetSpecPathName.Text.ToUpper();
-                if (string.IsNullOrWhiteSpace(spec))
-                {
-                    MessageBox.Show("请输入环境变量名!", "warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                string name = cls_EnvUtils.GetSysEnvironmentByName(spec);
-
-                if (string.IsNullOrEmpty(name))
-                {
-                    MessageBox.Show("不存在该环境变量名!", "warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                DialogResult dr = MessageBox.Show("是否添加bin目录?", "Q", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-                if (dr == DialogResult.Yes)
-                    cls_EnvUtils.UpdateSysEnvironment(name, true);
-                else if (dr == DialogResult.No)
-                    cls_EnvUtils.UpdateSysEnvironment(name, false);
-                else
-                    return;
-
-                MessageBox.Show("设置成功!", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
-        }
-
-        private void lst_EnvPathName_MouseDown(object sender, MouseEventArgs e)
-        {
-            if(e.Button==MouseButtons.Right)
-            {
-                int pos = GetScrollPos(lst_ShowEnvPathName.Handle, 1);
-                int height = 0;
-                for (int i = 0; i < lst_ShowEnvPathName.Items.Count; i++)
-                {
-                    height += lst_ShowEnvPathName.GetItemHeight(i);
-                    if (e.Y <= height)
-                    {
-                        lst_ShowEnvPathName.SelectedIndex = i + pos;
-                        return;
-                    }
-                }
-            }
-        }
-
-        private void lst_EnvPathName_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (lst_ShowEnvPathName.SelectedIndex < 0)
-                return;
-
-            string spec = lst_ShowEnvPathName.GetItemText(lst_ShowEnvPathName.SelectedItem);
-            string name = cls_EnvUtils.GetSysEnvironmentByName(spec);
-
-            if (string.IsNullOrEmpty(name))
-            {
-                MessageBox.Show("不存在该环境变量名!", "warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            lst_ShowEnvPathValue.Items.Clear();
-            string[] path = name.Split(';');
-            lst_ShowEnvPathValue.Items.AddRange(path);
-        }
-
-        private void tsmi_DeleteEnvPath_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("确认删除环境变量?", "Q", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-                return;
-            string name = lst_ShowEnvPathName.GetItemText(lst_ShowEnvPathName.SelectedItem);
-            cls_EnvUtils.DeleteSysEnvironmentByName(name);
-
-            RefreshEnvPathName();
-            lst_ShowEnvPathValue.Items.Clear();
-        }
         #endregion
 
         #region Function
-        public void RefreshEnvPathName()
+        public void RefreshSysEnvPath()
         {
-            System.Threading.Thread.Sleep(5);
-            lst_ShowEnvPathName.Items.Clear();
+            dgv_SysEnvPath.Rows.Clear();
             string[] allName = cls_EnvUtils.GetAllSysEnvironmentName();
-            lst_ShowEnvPathName.Items.AddRange(allName);
+            for (int i = 0; i < allName.Length; i++)
+            {
+                DataGridViewRow row = new DataGridViewRow();
+                DataGridViewTextBoxCell nameCell = new DataGridViewTextBoxCell();
+                nameCell.Value = allName[i];
+                DataGridViewTextBoxCell valueCell = new DataGridViewTextBoxCell();
+                valueCell.Value = cls_EnvUtils.GetSysEnvironmentByName(allName[i]);
+                row.Cells.Add(nameCell);
+                row.Cells.Add(valueCell);
+                dgv_SysEnvPath.Rows.Add(row);
+            }
+        }
+
+        public void RefreshUserEnvPath()
+        {
+            dgv_UserEnvPath.Rows.Clear();
+            string[] allName = cls_EnvUtils.GellAllUserEnvironmentName();
+            for (int i = 0; i < allName.Length; i++)
+            {
+                DataGridViewRow row = new DataGridViewRow();
+                DataGridViewTextBoxCell nameCell = new DataGridViewTextBoxCell();
+                nameCell.Value = allName[i];
+                DataGridViewTextBoxCell valueCell = new DataGridViewTextBoxCell();
+                valueCell.Value = cls_EnvUtils.GetUserEnvironmentByName(allName[i]);
+                row.Cells.Add(nameCell);
+                row.Cells.Add(valueCell);
+                dgv_UserEnvPath.Rows.Add(row);
+            }
         }
         #endregion
 
@@ -264,9 +150,35 @@ namespace EnvPathSetting
         protected override void WndProc(ref Message m)
         {
             switch (m.Msg){
-                case cls_Common.RELEASE_SAVE_AND_UNMAKE:
-                    tsmi_Save.Enabled = true;
-                    tsmi_Unmake.Enabled = true;
+                case cls_Common.ADD_USER_ENV_PATH:
+                    string userField = Marshal.PtrToStringAnsi(m.WParam);
+                    string[] userFields = userField.Split('^');
+                    DataGridViewRow userRow = new DataGridViewRow();
+                    DataGridViewTextBoxCell userNameCell = new DataGridViewTextBoxCell();
+                    userNameCell.Value = userFields[0];
+                    DataGridViewTextBoxCell userValueCell = new DataGridViewTextBoxCell();
+                    userValueCell.Value = userFields[1];
+                    userRow.Cells.Add(userNameCell);
+                    userRow.Cells.Add(userValueCell);
+                    dgv_UserEnvPath.Rows.Add(userRow);
+                    break;
+
+                case cls_Common.ADD_SYS_ENV_PATH:
+                    string sysField = Marshal.PtrToStringAnsi(m.WParam);
+                    string[] sysFields = sysField.Split('^');
+                    DataGridViewRow sysRow = new DataGridViewRow();
+                    DataGridViewTextBoxCell sysNameCell = new DataGridViewTextBoxCell();
+                    sysNameCell.Value = sysFields[0];
+                    DataGridViewTextBoxCell sysValueCell = new DataGridViewTextBoxCell();
+                    sysValueCell.Value = sysFields[1];
+                    sysRow.Cells.Add(sysNameCell);
+                    sysRow.Cells.Add(sysValueCell);
+                    dgv_SysEnvPath.Rows.Add(sysRow);
+                    break;
+
+                case cls_Common.REFRESH_MAIN_DGV_INFO:
+                    RefreshSysEnvPath();
+                    RefreshUserEnvPath();
                     break;
 
                 default:

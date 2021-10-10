@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resource\bitbug_favicon.ico</ApplicationIcon>
+    <ApplicationIcon>Resource\my.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -51,7 +51,6 @@
   <ItemGroup>
     <Compile Include="Class\cls_Common.cs" />
     <Compile Include="Class\cls_EnvUtils.cs" />
-    <Compile Include="Class\cls_ListBoxEditor.cs" />
     <Compile Include="Form\frm_Explain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,6 +63,18 @@
     <Compile Include="Form\frm_Main.Designer.cs">
       <DependentUpon>frm_Main.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form\frm_AddEnvPath.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\frm_AddEnvPath.Designer.cs">
+      <DependentUpon>frm_AddEnvPath.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form\frm_MdfEnvPath.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\frm_MdfEnvPath.Designer.cs">
+      <DependentUpon>frm_MdfEnvPath.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\frm_Explain.resx">
@@ -71,6 +82,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form\frm_Main.resx">
       <DependentUpon>frm_Main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\frm_AddEnvPath.resx">
+      <DependentUpon>frm_AddEnvPath.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\frm_MdfEnvPath.resx">
+      <DependentUpon>frm_MdfEnvPath.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -95,7 +112,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resource\bitbug_favicon.ico" />
+    <Content Include="Resource\my.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

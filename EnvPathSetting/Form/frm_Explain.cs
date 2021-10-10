@@ -12,14 +12,13 @@ namespace EnvPathSetting
 {
     public partial class frm_Explain : Form
     {
+
+        #region Constructor
         public frm_Explain()
         {
             InitializeComponent();
         }
+        #endregion
 
-        private void frm_Explain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            this.Dispose();
-        }
     }
 }

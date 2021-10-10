@@ -5,30 +5,52 @@ namespace EnvPathSetting.Class
 {
     class cls_EnvUtils
     {
-        //DllImport("Kernel32.DLL ", SetLastError = true)]
-        //public static extern bool SetEnvironmentVariable(string lpName, string lpValue);
-
         /// <summary>
-        /// 删除指定的环境变量
+        /// 获取所有系统的环境变量名
         /// </summary>
-        /// <param name="name"></param>
         /// <returns></returns>
-        public static bool DeleteSysEnvironmentByName(string name)
+        public static string[] GetAllSysEnvironmentName()
         {
-            try
-            {
-                OpenSysEnvironment().DeleteValue(name);
-            }
-            catch(Exception)
-            {
-                return false;
-            }
-
-            return true;
+            return OpenSysEnvironment().GetValueNames();
         }
 
         /// <summary>
-        /// 获取指定的环境变量值
+        /// 获取所有当前用户的环境变量名
+        /// </summary>
+        /// <returns></returns>
+        public static string[] GellAllUserEnvironmentName()
+        {
+            return OpenUserEnvironment().GetValueNames();
+        }
+
+        /// <summary>
+        /// 获取系统的环境变量
+        /// </summary>
+        /// <returns></returns>
+        private static RegistryKey OpenSysEnvironment()
+        {
+            RegistryKey regLocalMachine = Registry.LocalMachine;
+            RegistryKey regSYSTEM = regLocalMachine.OpenSubKey("SYSTEM", true);
+            RegistryKey regControlSet001 = regSYSTEM.OpenSubKey("ControlSet001", true);
+            RegistryKey regControl = regControlSet001.OpenSubKey("Control", true);
+            RegistryKey regManager = regControl.OpenSubKey("Session Manager", true);
+            RegistryKey regEnvironment = regManager.OpenSubKey("Environment", true);
+            return regEnvironment;
+        }
+
+        /// <summary>
+        /// 获取当前用户的环境变量
+        /// </summary>
+        /// <returns></returns>
+        private static RegistryKey OpenUserEnvironment()
+        {
+            RegistryKey regCurrentUser = Registry.CurrentUser;
+            RegistryKey regEnvironment = regCurrentUser.OpenSubKey("Environment", true);
+            return regEnvironment;
+        }
+
+        /// <summary>
+        /// 获取指定的系统环境变量值
         /// </summary>
         /// <param name="name">环境变量名</param>
         /// <returns></returns>
@@ -48,32 +70,65 @@ namespace EnvPathSetting.Class
         }
 
         /// <summary>
-        /// 获取所有环境变量名
+        /// 获取指定的当前用户环境变量值
         /// </summary>
+        /// <param name="name">环境变量名</param>
         /// <returns></returns>
-        public static string[] GetAllSysEnvironmentName()
+        public static string GetUserEnvironmentByName(string name)
         {
-            return OpenSysEnvironment().GetValueNames();
+            string result;
+            try
+            {
+                result = OpenUserEnvironment().GetValue(name).ToString();
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+
+            return result;
         }
 
         /// <summary>
-        /// 获取环境变量
+        /// 删除系统环境变量
         /// </summary>
+        /// <param name="name">环境变量名</param>
         /// <returns></returns>
-        private static RegistryKey OpenSysEnvironment()
+        public static bool DeleteSysEnvironmentByName(string name)
         {
-            RegistryKey regLocalMachine = Registry.LocalMachine;
-            RegistryKey regSYSTEM = regLocalMachine.OpenSubKey("SYSTEM", true);
-            RegistryKey regControlSet001 = regSYSTEM.OpenSubKey("ControlSet001", true);
-            RegistryKey regControl = regControlSet001.OpenSubKey("Control", true);
-            RegistryKey regManager = regControl.OpenSubKey("Session Manager", true);
+            try
+            {
+                OpenSysEnvironment().DeleteValue(name);
+            }
+            catch(Exception)
+            {
+                return false;
+            }
 
-            RegistryKey regEnvironment = regManager.OpenSubKey("Environment", true);
-            return regEnvironment;
+            return true;
         }
 
         /// <summary>
-        /// 设置环境变量
+        /// 删除当前用户环境变量
+        /// </summary>
+        /// <param name="name">环境变量名</param>
+        /// <returns></returns>
+        public static bool DeleteUserEnvironmentByName(string name)
+        {
+            try
+            {
+                OpenUserEnvironment().DeleteValue(name);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 设置系统环境变量
         /// </summary>
         /// <param name="name">环境变量名</param>
         /// <param name="value">环境变量值</param>
@@ -83,77 +138,15 @@ namespace EnvPathSetting.Class
         }
 
         /// <summary>
-        /// 更新SYSPATH环境变量
-        /// </summary>
-        /// <param name="name">环境变量名</param>
-        public static void UpdateSysEnvironment(string name,bool bin)
-        {
-            string path = GetSysEnvironmentByName("PATH");
-
-            if(path.Substring(path.Length-1,1)!=";")
-            {
-                SetSysEnvironment("PATH", path + ";");
-                path = GetSysEnvironmentByName("PATH");
-            }
-
-            string[] list = path.Split(';');
-            bool isPathExist = false;
-
-            foreach(string item in list)
-            {
-                if (item == name)
-                    isPathExist = true;
-            }
-
-            if (!isPathExist)
-            {
-                if (bin)
-                    name = name + "\\bin;";
-                else
-                    name = name + ";";
-                SetSysEnvironment("PATH",  path+ name);
-            }
-        }
-
-        /// <summary>
-        /// 更新SYSPATH环境变量
+        /// 设置当前用户环境变量
         /// </summary>
         /// <param name="name">环境变量名</param>
         /// <param name="value">环境变量值</param>
-        public static void UpdateSysEnvironment(string name, string value)
+        public static void SetUserEnvironment(string name,string value)
         {
-            SetSysEnvironment(name, value);
+            OpenUserEnvironment().SetValue(name, value);
         }
 
-        /// <summary>
-        /// 更新SPEC环境变量
-        /// </summary>
-        /// <param name="name">环境变量名</param>
-        /// <param name="value">环境变量值</param>
-        public static void UpdateSpecEnvironment(string name, string value)
-        {
-            string path = GetSysEnvironmentByName(name);
 
-            if (path.Substring(path.Length - 1, 1) != ";")
-            {
-                SetSysEnvironment(name, path + ";");
-                path = GetSysEnvironmentByName(name);
-            }
-
-            string[] list = path.Split(';');
-            bool isPathExist = false;
-
-            foreach (string item in list)
-            {
-                if (item == value)
-                    isPathExist = true;
-            }
-
-            if (!isPathExist)
-            {
-                value = value + ";";
-                SetSysEnvironment(name, path + value);
-            }
-        }
     }
 }
