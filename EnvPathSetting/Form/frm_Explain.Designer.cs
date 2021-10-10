@@ -32,6 +32,8 @@ namespace EnvPathSetting
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frm_Explain));
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.pb_Author = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pb_Author)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -48,15 +50,26 @@ namespace EnvPathSetting
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(225, 76);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(95, 40);
+            this.label2.Size = new System.Drawing.Size(93, 40);
             this.label2.TabIndex = 1;
-            this.label2.Text = "By Rekichan\r\n2021-10-11";
+            this.label2.Text = "By Gazeon\r\n2021-10-11";
+            // 
+            // pb_Author
+            // 
+            this.pb_Author.Image = global::EnvPathSetting.Properties.Resources.favicon;
+            this.pb_Author.Location = new System.Drawing.Point(179, 76);
+            this.pb_Author.Name = "pb_Author";
+            this.pb_Author.Size = new System.Drawing.Size(40, 40);
+            this.pb_Author.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pb_Author.TabIndex = 2;
+            this.pb_Author.TabStop = false;
             // 
             // frm_Explain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(332, 125);
+            this.Controls.Add(this.pb_Author);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -71,6 +84,7 @@ namespace EnvPathSetting
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "软件说明";
             this.TopMost = true;
+            ((System.ComponentModel.ISupportInitialize)(this.pb_Author)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -80,5 +94,6 @@ namespace EnvPathSetting
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.PictureBox pb_Author;
     }
 }
