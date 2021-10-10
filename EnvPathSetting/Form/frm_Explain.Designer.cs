@@ -48,9 +48,9 @@ namespace EnvPathSetting
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(225, 76);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(95, 40);
+            this.label2.Size = new System.Drawing.Size(93, 40);
             this.label2.TabIndex = 1;
-            this.label2.Text = "By Rekichan\r\n2021-10-11";
+            this.label2.Text = "By Gazeon\r\n2021-10-11";
             // 
             // frm_Explain
             // 
